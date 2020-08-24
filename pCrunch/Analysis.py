@@ -260,7 +260,16 @@ class Loads_Analysis(object):
             return load_ranking
 
     def get_DEL(self, fast_data, chan_info, binNum=100, t=600):
-        """ Calculates the short-term damage equivalent load of multiple variables
+        """ Calculates the short-term damage equivalent load of multiple variables.
+        4-point rainflow counting algorithm from fatpack module is based on the following resources:
+        
+        - `C. Amzallag et. al. Standardization of the rainflow counting method for
+        fatigue analysis. International Journal of Fatigue, 16 (1994) 287-293`
+        - `ISO 12110-2, Metallic materials - Fatigue testing - Variable amplitude
+        fatigue testing.`
+        - `G. Marsh et. al. Review and application of Rainflow residue processing
+        techniques for accurate fatigue damage estimation. International Journal
+        of Fatigue, 82 (2016) 757-765`
         
         Parameters: 
         -----------
@@ -272,7 +281,7 @@ class Loads_Analysis(object):
             ie. ('TwrBsFxt',4)
         
         binNum : int
-            number of bins for rainflow counting method (minimum=100)
+            number of bins for rainflow counting method
         
         t : float/int
             Used to control DEL frequency. Default for 1Hz is 600 seconds for 10min data
@@ -301,7 +310,7 @@ class Loads_Analysis(object):
             # loop through channels and apply corresponding fatigue slope
             for var in dic.keys():
                 # find rainflow ranges
-                ranges = fatpack.find_rainflow_ranges(fd[var])
+                ranges = fatpack.find_rainflow_ranges(fd[var], k=256)
 
                 # find range count and bin
                 Nrf, Srf = fatpack.find_range_count(ranges,binNum)
